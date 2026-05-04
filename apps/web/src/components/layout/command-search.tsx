@@ -30,7 +30,7 @@ type CommandItem = {
 
 const commandItems: CommandItem[] = [
   {
-    href: '/',
+    href: '/home',
     title: 'Dashboard',
     description: '전체 매크로와 입찰 상태를 한 화면에서 확인합니다.',
     group: '이동',

@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "start:dev": "node --watch --loader ts-node/esm src/main.ts",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "start:dev": "tsx watch --clear-screen=false src/main.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "start": "tsx src/main.ts"
   },
   "dependencies": {
     "@market-ops/shared": "0.1.0",

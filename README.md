@@ -1,88 +1,127 @@
 # Market Ops Console
 
-## 🚀 Project Overview / 프로젝트 개요
+**운영 자동화 콘솔의 기술 구조를 포트폴리오로 재구성한 모노레포입니다.**  
+*A portfolio monorepo reconstructed from a live operations automation project.*
 
-Market Ops Console은 현재 서비스 중인 마켓 운영 자동화 프로젝트에서 핵심 실행 로직과 실제 외부 연동을 제외하고, 기술 구조와 제품 경험을 포트폴리오 형태로 재구성한 모노레포입니다.
+> 데모 URL: *(배포 완료 후 추가 예정)*
 
-Market Ops Console is a portfolio monorepo derived from a live operations automation project. It removes the private automation runtime and real external integrations, while keeping the architecture, contracts, UI flow, and deployment thinking visible.
+---
 
-이 레포의 목적은 단순한 화면 데모가 아니라, 운영 도구를 웹/API 구조로 설계하고 배포 가능한 형태로 다듬은 과정을 보여주는 것입니다.
+## 이 프로젝트에 대해 / About This Project
 
-The focus is not just a UI showcase. It highlights the engineering shape behind an operations console: contract-first schemas, separated web/API boundaries, runtime state modeling, infrastructure notes, performance work, security hardening, and deployment troubleshooting.
+실제 서비스 중인 플랫폼 운영 자동화 프로젝트를 기반으로 만든 포트폴리오 버전입니다.  
+민감한 외부 연동 로직과 운영 시크릿은 제외했고, 아키텍처 설계 방식과 엔지니어링 의사결정 과정을 중심으로 구성했습니다.
 
-## ✨ What This Shows / 보여주는 것
+*This is a portfolio edition of a live platform operations automation project. Private runtime logic and credentials are intentionally removed. The focus is on architectural decisions, contract design, and operational engineering.*
 
-- 실제 서비스 구조를 바탕으로 한 `Next.js + NestJS` 모노레포
-- A Next.js + NestJS monorepo based on a real service architecture
-- `packages/shared`의 Zod schema를 기준으로 한 계약 우선 설계
-- Contract-first development with shared Zod schemas
-- 서버 실행기와 외부 연동을 제외한 데모 API와 목업 데이터 레이어
-- Demo API and mock data layer with private worker/integration logic removed
-- Vercel Web과 VM/container API를 분리해 생각한 배포 구조
-- Deployment design that separates Vercel web from VM/container API services
-- 성능 최적화, 보안 하드닝, 트러블슈팅 기록을 포함한 운영 관점 문서
-- Operational documentation covering performance, security hardening, and troubleshooting
+단순한 UI 데모가 아니라, 운영 도구를 웹/API 구조로 어떻게 설계하고, 어떤 문제를 풀었는지를 보여주는 것이 목적입니다.
 
-## 🧱 Stack / 기술 스택
+*The goal is not just a UI showcase — it demonstrates how I designed a web/API operations console, what problems I solved, and how I reasoned through trade-offs.*
 
-| Area | Stack | Notes |
-| --- | --- | --- |
-| Web / 웹 | Next.js App Router, React 18, Tailwind CSS, Framer Motion, Recharts | 운영 상태, 입찰 테이블, 작업 큐, 알림, 테마 UI |
-| API / API | NestJS, module/controller/service structure | 실제 연동 대신 계약 형태의 데모 데이터 제공 |
-| Contract / 계약 | Zod, shared TypeScript types | 웹과 API가 같은 응답 계약 참조 |
-| Infra / 인프라 | Docker Compose, env samples, Vercel-ready web | 로컬 API 데모와 분리 배포 관점 문서화 |
-| Quality / 품질 | TypeScript strict mode, workspace build scripts | `typecheck`와 `build`가 shared, API, web을 순서대로 검증 |
+---
 
-## 🗂️ Repository Structure / 레포 구조
+## 무엇을 설계했는가 / What I Built
 
-~~~txt
-apps/web/            # Next.js portfolio web demo / 포트폴리오 웹 데모
-apps/api/            # NestJS demo API / 데모 API
-packages/shared/     # Zod contracts / 공용 계약
-infra/docker/        # Local demo infrastructure / 로컬 데모 인프라
-infra/env/           # Environment notes / 환경 변수 안내
-docs/architecture/   # Architecture notes / 아키텍처 문서
-docs/deployment/     # Deployment notes / 배포 문서
-docs/portfolio/      # Performance, security, troubleshooting records / 포트폴리오 운영 기록
-~~~
+### 계약 우선 모노레포 구조 / Contract-First Monorepo
 
-## 🧪 Demo Modes / 데모 방식
+`packages/shared`에 Zod schema를 먼저 정의하고, Next.js 웹과 NestJS API가 같은 패키지를 통해 응답 형태를 맞추도록 설계했습니다.  
+스키마가 단일 진실 공급원(single source of truth) 역할을 해서 웹/API 간 타입 불일치를 구조적으로 차단합니다.
 
-`apps/web`은 Vercel에 바로 올릴 수 있는 포트폴리오 웹 데모입니다. 운영 API URL 없이도 hosted demo를 열어볼 수 있도록 local mock handler를 포함합니다.
+*Shared Zod schemas act as the single source of truth. Both the web and API layers consume the same package, making type drift between services structurally impossible.*
 
-`apps/web` is a Vercel-ready portfolio web demo. It includes local mock handlers, so reviewers can open the hosted demo without a production API URL.
+### Vercel + VM 분리 배포 관점 / Split Deployment Architecture
 
-`apps/api`는 같은 shared contract를 NestJS controller/service 경계에서 제공하는 데모 API입니다. 실제 production runtime을 노출하기 위한 앱이 아니라, 백엔드 구조와 계약 경계를 보여주기 위한 앱입니다.
+웹(Vercel)과 API/DB(VM)를 분리해 운영하는 구조를 전제로 설계했습니다.  
+Vercel BFF와 VM API 사이의 장기 연결 비용, 인증 round-trip, 페이지 진입 시 다중 API 호출 문제를 구체적으로 다뤘습니다.
 
-`apps/api` serves the same shared contracts through NestJS controller/service boundaries. It exists to show the backend structure and contract boundary, not to expose the private production runtime.
+*Designed with a Vercel web + VM API split in mind. Addressed the latency costs of cross-boundary round-trips, auth serialization, and multi-fetch page entries — not just as theory, but as specific optimizations.*
 
-## 📚 Documentation / 문서
+### 운영 콘솔 UI / Operational Console UI
 
-- [Architecture Overview](docs/architecture/overview.md) / 아키텍처 개요
-- [Runtime Model](docs/architecture/realtime-and-workers.md) / 런타임 모델
-- [Deployment](docs/deployment/vercel-and-api.md) / 배포 구조
-- [Portfolio Case Study](docs/portfolio/case-study.md) / 포트폴리오 케이스 스터디
-- [Performance Optimization](docs/portfolio/performance-optimization.md) / 성능 최적화 기록
-- [Security Hardening](docs/portfolio/security-hardening.md) / 보안 하드닝 기록
-- [Troubleshooting Log](docs/portfolio/troubleshooting-log.md) / 트러블슈팅 로그
+작업 허브, 루프별 상세, current 스냅샷, 계정 관리, 실시간 로그, 알림을 포함한 운영 전용 UI입니다.  
+SSE 기반 실시간 상태를 단일 연결에서 컴포넌트별로 구독 분배하는 이벤트 아키텍처를 적용했습니다.
 
-## ⚙️ Getting Started / 실행 방법
+*An operations-first UI covering job hub, loop detail, current snapshots, account management, real-time logs, and notifications. SSE events are distributed from a single connection to component-level subscribers via an internal event bus.*
 
-~~~bash
+### 성능 최적화 / Performance Optimization
+
+구조적으로 측정 가능한 개선을 적용했습니다:
+
+| 개선 항목 | Before | After |
+|---|---|---|
+| 브라우저 SSE 연결 수 | 화면/컴포넌트별 중복 연결 가능 | 앱 셸 기준 1개 |
+| 보호 페이지 인증 확인 | 서버 렌더마다 `/auth/me` API 직렬 호출 | middleware cookie gate로 추가 왕복 제거 |
+| 콘솔 주요 페이지 진입 API 호출 | 루프/상태/큐 등 5~9회 개별 호출 | aggregate read model API 1회 |
+| 매크로 상세 페이지 진입 API 호출 | 계정/상태/작업 목록 개별 조회 | `/overview/macro-detail` 1회 |
+| 모달 열기/닫기 | URL navigation → 서버 페이지 전체 refetch | client-side URL modal state로 즉시 반응 |
+| 실시간 로그 브라우저 보관 | 장시간 실행 시 DOM 무제한 증가 | 최근 120개 슬라이딩 윈도우 |
+| SSE 계정 소유권 확인 DB 쿼리 | 이벤트 발행마다 DB 조회 | 연결 단위 30초 TTL 캐시 |
+
+*Quantifiable structural improvements — not micro-optimizations, but re-designed API boundaries and event architecture.*
+
+---
+
+## 기술 스택 / Stack
+
+| 영역 | 스택 | 선택 이유 |
+|---|---|---|
+| Web | Next.js App Router, React 18, Tailwind CSS | 서버 컴포넌트 기반 초기 렌더와 BFF 구조가 운영 콘솔에 적합 |
+| Animation / Chart | Framer Motion, Recharts | 상태 전환 인터랙션과 운영 지표 시각화 |
+| API | NestJS (module/controller/service) | 명시적인 레이어 경계와 DI 구조가 유지보수에 유리 |
+| Contract | Zod, shared TypeScript types | 웹/API가 같은 schema를 참조해 타입 drift 방지 |
+| Infra | Docker Compose, systemd 기반 VM 운영 | 로컬 데모와 실제 VM 운영 환경을 함께 고려 |
+| Quality | TypeScript strict mode, workspace build scripts | `typecheck`와 `build`가 shared → API → web 순서로 검증 |
+
+---
+
+## 레포 구조 / Repository Structure
+
+```
+apps/web/            # Next.js 운영 콘솔 웹 데모 (Vercel-ready)
+apps/api/            # NestJS 데모 API (계약 경계 시연)
+packages/shared/     # Zod schema 및 공용 TypeScript 타입
+infra/docker/        # 로컬 데모용 Docker Compose
+infra/env/           # 환경 변수 안내
+docs/architecture/   # 아키텍처 및 런타임 모델 문서
+docs/deployment/     # 배포 구조 및 인프라 메모
+docs/portfolio/      # 성능 최적화, 보안, 트러블슈팅 기록
+```
+
+---
+
+## 문서 / Documentation
+
+설계 의사결정과 운영 관점 기록을 함께 남겼습니다.
+
+- [Architecture Overview](docs/architecture/overview.md) — 전체 구조와 경계 설계
+- [Runtime Model](docs/architecture/realtime-and-workers.md) — 실시간 이벤트와 워커 런타임 모델
+- [Deployment](docs/deployment/vercel-and-api.md) — Vercel + VM 분리 배포 구조
+- [Case Study](docs/portfolio/case-study.md) — 프로젝트 배경과 엔지니어링 스토리
+- [Performance Optimization](docs/portfolio/performance-optimization.md) — 구조적 성능 개선 기록
+- [Security Hardening](docs/portfolio/security-hardening.md) — 보안 설계 및 강화 기록
+- [Troubleshooting Log](docs/portfolio/troubleshooting-log.md) — 실제 트러블슈팅 사례
+
+---
+
+## 실행 방법 / Getting Started
+
+```bash
 npm install
-npm run dev:web
-npm run dev:api
-~~~
+npm run dev:web   # Next.js 웹 데모 (API 없이도 mock handler로 동작)
+npm run dev:api   # NestJS 데모 API
+```
 
-## ✅ Verification / 검증
+```bash
+npm run typecheck  # shared → api → web 순서 타입 검증
+npm run build      # 전체 빌드 검증
+```
 
-~~~bash
-npm run typecheck
-npm run build
-~~~
+---
 
-## 📝 Portfolio Note / 포트폴리오 메모
+## 포트폴리오 노트 / Portfolio Note
 
-이 저장소는 현재 서비스 중인 프로젝트의 기술적 구조를 설명하기 위한 포트폴리오 버전입니다. 실제 외부 API 클라이언트, 계정 세션 처리, 자동화 실행기 내부 로직, 운영 시크릿은 포함하지 않았고, 공개 가능한 데모 데이터와 문서로 제품 흐름과 엔지니어링 의사결정을 보여줍니다.
+이 저장소는 현재 서비스 중인 프로젝트의 포트폴리오 버전입니다.  
+실제 외부 API 클라이언트, 계정 세션 처리, 자동화 실행기 내부 로직, 운영 시크릿은 포함하지 않았습니다.  
+공개 가능한 데모 데이터와 문서를 통해 제품 흐름과 엔지니어링 의사결정을 확인할 수 있습니다.
 
-This repository is the portfolio edition of an active service project. It keeps the engineering structure and product flow, while replacing private runtime logic with reviewable demo data and documentation.
+*This is the portfolio edition of an active service. Private runtime logic, credentials, and external API clients are excluded. Engineering decisions and product flow are visible through demo data and documentation.*

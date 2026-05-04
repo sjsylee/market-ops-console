@@ -1,407 +1,239 @@
-import Link from "next/link";
+import Link from 'next/link';
 import {
   Activity,
-  Archive,
-  BadgeDollarSign,
+  BellRing,
+  Boxes,
+  CheckCircle2,
   Gauge,
-  Sparkles,
-} from "lucide-react";
-import type { ReactNode } from "react";
-import type { CurrentSyncState } from "@market-ops/shared";
+  Laptop,
+  LineChart,
+  MonitorSmartphone,
+  RefreshCw,
+  ShieldCheck,
+  SlidersHorizontal,
+  Smartphone,
+  Zap,
+} from 'lucide-react';
 
-import { SectionHero } from "../components/dashboard/section-hero";
-import { Reveal } from "../components/ui/reveal";
-import { requireAuthenticatedPage } from "../lib/auth";
-import { createPageMetadata } from "../lib/page-metadata";
-import { getMacroSummary } from "../lib/jobs";
-import { getConsoleOverview } from "../lib/overview";
+import { Reveal } from '../components/ui/reveal';
+import { createPageMetadata } from '../lib/page-metadata';
 
 export const metadata = createPageMetadata(
-  "Dashboard",
-  "매크로 실행 상태와 입찰 데이터를 한 화면에서 확인하는 Market Ops Console 대시보드입니다.",
+  '서비스 소개',
+  '마켓 운영, 입찰 관리, 가격 작업을 웹과 모바일에서 안정적으로 관리하는 운영 콘솔입니다.',
 );
 
-function formatDateTime(value: string | null | undefined) {
-  return value
-    ? new Date(value).toLocaleString("ko-KR", {
-        month: "numeric",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    : "기록 없음";
-}
+const outcomes = [
+  { value: '24h', label: '상태를 놓치지 않는 운영 흐름' },
+  { value: '1곳', label: '입찰·작업·알림을 모아보는 콘솔' },
+  { value: 'Web/Mobile', label: '책상 앞과 이동 중 모두 대응' },
+];
 
-function isCurrentAreaRunning(
-  state: CurrentSyncState,
-  area: "inventory" | "ask",
-) {
-  if (!state.running) return false;
+const benefits = [
+  {
+    icon: Activity,
+    title: '입찰 현황을 한눈에',
+    description: '보관 판매와 일반 판매 입찰을 상품 단위로 정리하고, 가격·수수료·최고 입찰 흐름을 빠르게 확인합니다.',
+  },
+  {
+    icon: Boxes,
+    title: '반복 작업은 큐로 관리',
+    description: '대기, 진행, 성공, 실패 상태를 작업별로 분리해 운영자가 다음 액션을 바로 판단할 수 있습니다.',
+  },
+  {
+    icon: BellRing,
+    title: '놓치기 쉬운 상태를 알림으로',
+    description: '동기화 완료, 작업 실패, 확인이 필요한 계정 상태를 알림으로 모아 장시간 운영 부담을 줄입니다.',
+  },
+  {
+    icon: ShieldCheck,
+    title: '운영 경계를 지키는 설계',
+    description: '계정별 기준과 작업 상태를 분리해 여러 작업이 동시에 돌아가도 흐름이 섞이지 않도록 구성했습니다.',
+  },
+];
 
-  if (state.scope) {
-    if (state.scope === "ALL") return true;
-    return area === "inventory"
-      ? state.scope === "INVENTORY"
-      : state.scope === "ASK";
-  }
+const workflows = [
+  { icon: RefreshCw, title: '데이터 동기화', text: '입찰 목록과 상품 상태를 최신 기준으로 맞춥니다.' },
+  { icon: SlidersHorizontal, title: '가격 조정', text: '상품별 가격 기준과 작업 옵션을 빠르게 확인합니다.' },
+  { icon: LineChart, title: '운영 추적', text: '작업 성공률, 실패 사유, 큐 상태를 누적해서 봅니다.' },
+];
 
-  return area === "inventory"
-    ? state.stage === "sync_inventory"
-    : state.stage === "sync_ask";
-}
-
-export default async function HomePage() {
-  await requireAuthenticatedPage("/");
-
-  const overview = await getConsoleOverview();
-  const generalSelection = overview.selections.generalLoop;
-  const vendorSelection = overview.selections.bpLoop;
-  const purchaseBidSelection = overview.selections.imLoop;
-  const currentSelection = overview.selections.currentSync;
-  const general = overview.states.generalLoop;
-  const vendor = overview.states.bpLoop;
-  const purchaseBid = overview.states.imLoop;
-  const currentSyncState = overview.states.currentSync.state;
-  const lowestLoop = overview.states.lowestLoop;
-  const lowestQueue = overview.lowestLoopQueue;
-  const currentStats = overview.currentStats;
-
-  const generalSummary = getMacroSummary(general.state);
-  const vendorSummary = getMacroSummary(vendor.state);
-  const purchaseBidSummary = getMacroSummary(purchaseBid.state);
-  const currentStat = currentStats[0];
-  const lowestActiveCount =
-    lowestLoop.state.activeCount ||
-    lowestQueue.filter((item) => item.active).length;
-  const runningJobs = [
-    generalSummary.running,
-    vendorSummary.running,
-    purchaseBidSummary.running,
-    lowestLoop.state.running,
-  ].filter(Boolean).length;
-  const waitingJobs =
-    generalSummary.pendingCount +
-    vendorSummary.pendingCount +
-    purchaseBidSummary.pendingCount +
-    lowestActiveCount;
-  const failedJobs =
-    generalSummary.failedCount +
-    vendorSummary.failedCount +
-    purchaseBidSummary.failedCount;
-
-  const macroCards = [
-    {
-      href: "/jobs/general",
-      eyebrow: "Storage Macro",
-      title: "일반 보관",
-      account: generalSelection.account?.displayName ?? "계정 미선택",
-      running: generalSummary.running,
-      pending: generalSummary.pendingCount,
-      success: generalSummary.successCount,
-      failed: generalSummary.failedCount,
-    },
-    {
-      href: "/jobs/vendor",
-      eyebrow: "Vendor Storage",
-      title: "입점 보관",
-      account: vendorSelection.account?.displayName ?? "계정 미선택",
-      running: vendorSummary.running,
-      pending: vendorSummary.pendingCount,
-      success: vendorSummary.successCount,
-      failed: vendorSummary.failedCount,
-    },
-    {
-      href: "/jobs/purchase-bid",
-      eyebrow: "Purchase Bid",
-      title: "구매 입찰",
-      account: purchaseBidSelection.account?.displayName ?? "계정 미선택",
-      running: purchaseBidSummary.running,
-      pending: purchaseBidSummary.pendingCount,
-      success: purchaseBidSummary.successCount,
-      failed: purchaseBidSummary.failedCount,
-    },
-    {
-      href: "/jobs/lowest-bid",
-      eyebrow: "Lowest Bid Loop",
-      title: "최저가 루프",
-      account: currentSelection.account?.displayName ?? "입찰 계정 미선택",
-      running: lowestLoop.state.running,
-      pending: lowestActiveCount,
-      success: lowestLoop.state.cycleCount,
-      failed: lowestQueue.filter((item) => !item.active).length,
-      successLabel: "사이클",
-      failedLabel: "중지",
-    },
-  ];
-
-  const currentCards = [
-    {
-      href: "/current/inventory",
-      eyebrow: "Inventory Bids",
-      title: "보관 입찰",
-      icon: <Archive size={18} />,
-      count: currentStat?.storedCount ?? 0,
-      running: isCurrentAreaRunning(currentSyncState, "inventory"),
-      lastSyncedAt: formatDateTime(currentStat?.lastSyncStoredAt),
-    },
-    {
-      href: "/current/ask",
-      eyebrow: "Normal Bids",
-      title: "일반 입찰",
-      icon: <BadgeDollarSign size={18} />,
-      count: currentStat?.normalCount ?? 0,
-      running: isCurrentAreaRunning(currentSyncState, "ask"),
-      lastSyncedAt: formatDateTime(currentStat?.lastSyncNormalAt),
-    },
-  ];
-
+export default function DemoPage() {
   return (
-    <>
+    <div className="landing-page -mt-3 grid gap-14 pb-6 sm:gap-16">
+      <section className="landing-hero relative isolate min-h-[620px] overflow-hidden rounded-lg border border-subtle px-5 py-8 sm:min-h-[640px] sm:px-8 lg:px-12">
+        <div aria-hidden className="landing-hero-scene">
+          <div className="landing-dashboard">
+            <div className="landing-dashboard-top">
+              <span />
+              <span />
+              <span />
+            </div>
+            <div className="landing-dashboard-grid">
+              <div className="landing-metric running">
+                <small>실행 중</small>
+                <strong>4</strong>
+              </div>
+              <div className="landing-metric">
+                <small>대기 작업</small>
+                <strong>128</strong>
+              </div>
+              <div className="landing-chart">
+                <i style={{ height: '42%' }} />
+                <i style={{ height: '68%' }} />
+                <i style={{ height: '54%' }} />
+                <i style={{ height: '82%' }} />
+                <i style={{ height: '64%' }} />
+              </div>
+              <div className="landing-table">
+                <span />
+                <span />
+                <span />
+                <span />
+              </div>
+            </div>
+          </div>
+          <div className="landing-phone">
+            <div className="landing-phone-notch" />
+            <div className="landing-phone-status">
+              <span>입찰 관리</span>
+              <strong>안정</strong>
+            </div>
+            <div className="landing-phone-list">
+              <span />
+              <span />
+              <span />
+            </div>
+          </div>
+        </div>
+
+        <div className="landing-hero-copy relative z-10 flex min-h-[560px] max-w-3xl flex-col justify-center py-10 sm:min-h-[560px]">
+          <Reveal>
+            <p className="inline-flex w-fit rounded-full border border-glow bg-bg-card/75 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-accent-primary">
+              Market Operations Console
+            </p>
+            <h1 className="mt-5 max-w-3xl text-4xl font-black leading-tight text-text-primary sm:text-5xl lg:text-6xl">
+              입찰과 반복 작업을 더 안정적으로 운영하세요
+            </h1>
+            <p className="mt-5 max-w-2xl break-keep text-base leading-7 text-text-secondary sm:text-lg">
+              상품 입찰, 가격 기준, 반복 작업 상태를 한 화면에서 관리합니다. 웹과 모바일 어디서든 운영 흐름을 확인하고 필요한 조치를 바로 이어갈 수 있습니다.
+            </p>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <Link href="/home" className="btn-primary min-w-36 justify-center">콘솔 둘러보기</Link>
+              <Link href="/current" className="btn-secondary min-w-36 justify-center">입찰 관리 보기</Link>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      <section className="grid gap-3 sm:grid-cols-3">
+        {outcomes.map((item, index) => (
+          <Reveal key={item.label} delay={index * 0.04}>
+            <div className="landing-stat rounded-lg border border-subtle p-5">
+              <p className="text-3xl font-black text-text-primary">{item.value}</p>
+              <p className="mt-2 break-keep text-sm leading-6 text-text-secondary">{item.label}</p>
+            </div>
+          </Reveal>
+        ))}
+      </section>
+
+      <section className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-start">
+        <Reveal>
+          <div className="max-w-xl">
+            <p className="text-xs font-bold uppercase tracking-[0.12em] text-accent-primary">Operational Control</p>
+            <h2 className="mt-3 text-3xl font-black leading-tight text-text-primary sm:text-4xl">
+              바쁜 운영자가 바로 이해할 수 있는 화면
+            </h2>
+            <p className="mt-4 break-keep text-sm leading-7 text-text-secondary sm:text-base">
+              작업이 잘 돌고 있는지, 어떤 상품을 봐야 하는지, 어디서 실패가 났는지를 빠르게 파악하도록 구성했습니다. 복잡한 설정 화면보다 운영 판단에 필요한 정보가 먼저 보입니다.
+            </p>
+          </div>
+        </Reveal>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {benefits.map((item, index) => (
+            <Reveal key={item.title} delay={0.05 * index}>
+              <article className="landing-feature rounded-lg border border-subtle p-5">
+                <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-subtle bg-bg-card text-accent-primary">
+                  <item.icon size={18} />
+                </div>
+                <h3 className="mt-4 text-lg font-bold text-text-primary">{item.title}</h3>
+                <p className="mt-2 break-keep text-sm leading-6 text-text-secondary">{item.description}</p>
+              </article>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      <section className="landing-band rounded-lg border border-subtle p-5 sm:p-7 lg:p-8">
+        <div className="grid gap-8 lg:grid-cols-[1fr_1fr] lg:items-center">
+          <Reveal>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.12em] text-accent-primary">Responsive Operations</p>
+              <h2 className="mt-3 text-3xl font-black leading-tight text-text-primary sm:text-4xl">
+                사무실에서는 크게, 이동 중에는 빠르게
+              </h2>
+              <p className="mt-4 break-keep text-sm leading-7 text-text-secondary sm:text-base">
+                데스크톱에서는 전체 현황을 넓게 보고, 모바일에서는 입찰 상태와 작업 알림을 빠르게 확인합니다. 같은 운영 흐름을 화면 크기에 맞춰 끊기지 않게 제공합니다.
+              </p>
+              <div className="mt-5 flex flex-wrap gap-2">
+                <span className="landing-chip"><Laptop size={15} /> Web Dashboard</span>
+                <span className="landing-chip"><Smartphone size={15} /> Mobile Check</span>
+                <span className="landing-chip"><Gauge size={15} /> Stable Loop Status</span>
+              </div>
+            </div>
+          </Reveal>
+          <Reveal delay={0.08}>
+            <div className="landing-device-row">
+              <div className="landing-device desktop">
+                <div className="device-bar" />
+                <div className="device-content">
+                  <span />
+                  <span />
+                  <span />
+                </div>
+              </div>
+              <div className="landing-device mobile">
+                <div className="device-bar" />
+                <div className="device-content">
+                  <span />
+                  <span />
+                  <span />
+                </div>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-3">
+        {workflows.map((item, index) => (
+          <Reveal key={item.title} delay={0.05 * index}>
+            <article className="landing-workflow rounded-lg border border-subtle p-5">
+              <item.icon className="text-accent-primary" size={22} />
+              <h3 className="mt-4 text-lg font-bold text-text-primary">{item.title}</h3>
+              <p className="mt-2 break-keep text-sm leading-6 text-text-secondary">{item.text}</p>
+            </article>
+          </Reveal>
+        ))}
+      </section>
+
       <Reveal>
-        <SectionHero
-          eyebrow="Operations Dashboard"
-          title="Dashboard"
-          description="매크로 실행 상태와 입찰 데이터를 한 화면에서 확인하고, 필요한 작업으로 바로 이동합니다."
-        />
+        <section className="landing-cta rounded-lg border border-glow p-6 text-center sm:p-8">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg border border-glow bg-bg-card text-accent-primary">
+            <Zap size={22} />
+          </div>
+          <h2 className="mx-auto mt-5 max-w-2xl text-3xl font-black leading-tight text-text-primary sm:text-4xl">
+            운영 흐름을 한 번에 확인해보세요
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl break-keep text-sm leading-7 text-text-secondary sm:text-base">
+            데모 콘솔에는 입찰 관리, 작업 큐, 알림, 가격 흐름이 샘플 데이터로 구성되어 있습니다. 실제 사용 흐름처럼 화면을 이동하며 확인할 수 있습니다.
+          </p>
+          <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+            <Link href="/home" className="btn-primary justify-center"><CheckCircle2 size={16} /> 대시보드 시작</Link>
+            <Link href="/jobs" className="btn-secondary justify-center"><MonitorSmartphone size={16} /> 작업 화면 보기</Link>
+          </div>
+        </section>
       </Reveal>
-
-      <section className="mt-6 grid gap-4 sm:grid-cols-3">
-        <Reveal delay={0.05}>
-          <DashboardMetricCard
-            icon={<Activity size={18} />}
-            label="실행 중"
-            value={`${runningJobs}개`}
-            description="현재 작동 중인 매크로와 루프"
-            tone="info"
-          />
-        </Reveal>
-        <Reveal delay={0.1}>
-          <DashboardMetricCard
-            icon={<Gauge size={18} />}
-            label="대기/활성"
-            value={`${waitingJobs.toLocaleString("ko-KR")}건`}
-            description="처리 대기 중인 작업과 활성 큐"
-            tone="primary"
-          />
-        </Reveal>
-        <Reveal delay={0.15}>
-          <DashboardMetricCard
-            icon={<Sparkles size={18} />}
-            label="확인 필요"
-            value={`${failedJobs.toLocaleString("ko-KR")}건`}
-            description="실패 작업 기준 빠른 점검 대상"
-            tone={failedJobs > 0 ? "warning" : "success"}
-          />
-        </Reveal>
-      </section>
-
-      <section className="mt-6 grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
-        <Reveal delay={0.2}>
-          <div className="card-panel p-5 sm:p-6">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-xs uppercase tracking-[0.12em] text-text-muted">
-                  Macro Runtime
-                </p>
-                <h2 className="mt-2 text-2xl font-bold text-text-primary">
-                  매크로 상황
-                </h2>
-                <p className="mt-2 text-sm text-text-secondary">
-                  계정별 실행 상태와 큐 흐름을 빠르게 확인합니다.
-                </p>
-              </div>
-              <Link href="/jobs" className="btn-primary shrink-0">
-                전체 보기
-              </Link>
-            </div>
-
-            <div className="mt-5 grid gap-3 lg:grid-cols-2">
-              {macroCards.map((card) => (
-                <Link
-                  key={card.href}
-                  href={card.href}
-                  className={`macro-hub-card relative overflow-hidden rounded-3xl border border-subtle bg-bg-card/65 p-4 transition hover:border-glow ${card.running ? "macro-hub-card-running" : ""}`}
-                >
-                  {card.running ? (
-                    <>
-                      <div aria-hidden className="macro-running-aurora" />
-                      <div aria-hidden className="macro-running-sheen" />
-                    </>
-                  ) : null}
-                  <div className="relative z-10">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="text-xs uppercase tracking-[0.12em] text-text-muted">
-                          {card.eyebrow}
-                        </p>
-                        <h3 className="mt-1 truncate text-lg font-bold text-text-primary">
-                          {card.title}
-                        </h3>
-                      </div>
-                      <span
-                        className={`macro-status-pill ${card.running ? "macro-status-pill-running" : ""}`}
-                      >
-                        <span
-                          aria-hidden
-                          className={`macro-status-dot ${card.running ? "macro-status-dot-running" : ""}`}
-                        />
-                        {card.running ? "실행 중" : "대기 중"}
-                      </span>
-                    </div>
-                    <p className="mt-2 truncate text-xs text-text-muted">
-                      계정 · {card.account}
-                    </p>
-                    <div className="mt-4 grid grid-cols-3 gap-2">
-                      <MiniCount label="대기" value={card.pending} />
-                      <MiniCount
-                        label={card.successLabel ?? "성공"}
-                        value={card.success}
-                        tone="success"
-                      />
-                      <MiniCount
-                        label={card.failedLabel ?? "실패"}
-                        value={card.failed}
-                        tone={card.failedLabel ? "warning" : "failed"}
-                      />
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </Reveal>
-
-        <Reveal delay={0.25}>
-          <div className="card-panel h-full p-5 sm:p-6">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-xs uppercase tracking-[0.12em] text-text-muted">
-                  Bid Board
-                </p>
-                <h2 className="mt-2 text-2xl font-bold text-text-primary">
-                  입찰 현황
-                </h2>
-                <p className="mt-2 text-sm text-text-secondary">
-                  선택된 입찰 계정 기준 저장 데이터를 보여줍니다.
-                </p>
-              </div>
-              <Link href="/current" className="btn-primary shrink-0">
-                입찰 관리
-              </Link>
-            </div>
-
-            <div className="mt-5 grid gap-3">
-              {currentCards.map((card) => (
-                <Link
-                  key={card.href}
-                  href={card.href}
-                  className="rounded-3xl border border-subtle bg-bg-card/65 p-4 transition hover:border-glow"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="text-xs uppercase tracking-[0.12em] text-text-muted">
-                        {card.eyebrow}
-                      </p>
-                      <h3 className="mt-1 text-lg font-bold text-text-primary">
-                        {card.title}
-                      </h3>
-                    </div>
-                    <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-subtle bg-bg-card text-accent-primary">
-                      {card.icon}
-                    </span>
-                  </div>
-                  <div className="mt-4 flex items-end justify-between gap-3">
-                    <div>
-                      <p className="text-xs text-text-muted">저장 항목</p>
-                      <p className="mt-1 text-2xl font-black text-accent-primary">
-                        {card.count.toLocaleString("ko-KR")}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <span
-                        className={`macro-status-pill ${card.running ? "macro-status-pill-running" : ""}`}
-                      >
-                        <span
-                          aria-hidden
-                          className={`macro-status-dot ${card.running ? "macro-status-dot-running" : ""}`}
-                        />
-                        {card.running ? "동기화 중" : "대기 중"}
-                      </span>
-                      <p className="mt-2 text-xs text-text-muted">
-                        최근 · {card.lastSyncedAt}
-                      </p>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </Reveal>
-      </section>
-    </>
-  );
-}
-
-function DashboardMetricCard({
-  icon,
-  label,
-  value,
-  description,
-  tone,
-}: {
-  icon: ReactNode;
-  label: string;
-  value: string;
-  description: string;
-  tone: "primary" | "info" | "success" | "warning";
-}) {
-  const valueClass = {
-    primary: "text-accent-primary",
-    info: "status-value-info",
-    success: "status-value-success",
-    warning: "status-value-warning",
-  }[tone];
-
-  return (
-    <article className="card-panel p-4 sm:p-5">
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-xs uppercase tracking-[0.12em] text-text-muted">
-          {label}
-        </p>
-        <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-subtle bg-bg-card/65 text-accent-primary">
-          {icon}
-        </span>
-      </div>
-      <p className={`mt-3 text-3xl font-black leading-none ${valueClass}`}>
-        {value}
-      </p>
-      <p className="mt-2 text-sm text-text-secondary">{description}</p>
-    </article>
-  );
-}
-
-function MiniCount({
-  label,
-  value,
-  tone = "primary",
-}: {
-  label: string;
-  value: number;
-  tone?: "primary" | "success" | "failed" | "warning";
-}) {
-  const valueClass = {
-    primary: "text-text-primary",
-    success: "status-value-success",
-    failed: "status-value-failed",
-    warning: "status-value-warning",
-  }[tone];
-
-  return (
-    <div className="rounded-2xl border border-subtle bg-bg-card/60 p-3 text-center">
-      <p className="text-xs text-text-muted">{label}</p>
-      <p className={`mt-1 text-lg font-bold ${valueClass}`}>
-        {value.toLocaleString("ko-KR")}
-      </p>
     </div>
   );
 }
