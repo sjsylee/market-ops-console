@@ -1,5 +1,9 @@
 # ⚡ Performance Optimization / 성능 최적화 기록
 
+[← README](../../README.md) · 🔗 [Live Demo](https://market-ops-console-web.vercel.app/)
+
+---
+
 이 문서는 현재 서비스 중인 운영 콘솔 프로젝트에서 진행한 성능 개선 내용을 포트폴리오 관점으로 정리한 것입니다.
 
 This note summarizes performance work from the live operations project, rewritten for the portfolio repository without exposing private runtime details.

@@ -1,5 +1,9 @@
 # 🛡️ Security Hardening / 보안 하드닝 기록
 
+[← README](../../README.md) · 🔗 [Live Demo](https://market-ops-console-web.vercel.app/)
+
+---
+
 이 문서는 현재 서비스 프로젝트에서 진행한 보안 개선을 포트폴리오 관점으로 정리한 기록입니다.
 
 This document describes security hardening work from the live service project while omitting private integration details.

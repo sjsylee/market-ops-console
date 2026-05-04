@@ -1,5 +1,9 @@
 # 🔄 Runtime Model / 런타임 모델
 
+[← README](../../README.md) · 🔗 [Live Demo](https://market-ops-console-web.vercel.app/)
+
+---
+
 비공개 구현은 요청-응답 command와 장시간 실행 작업을 분리합니다. 운영 환경에서는 API command가 작업을 시작하거나 중지하고, 실행기는 request-response 타이밍 밖에서 장시간 루프를 처리합니다.
 
 The production model separates immediate API commands from long-running worker execution. API commands start or stop work, while workers run outside request-response timing and report progress asynchronously.

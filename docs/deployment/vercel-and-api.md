@@ -1,5 +1,9 @@
 # 🚢 Deployment / 배포
 
+[← README](../../README.md) · 🔗 [Live Demo](https://market-ops-console-web.vercel.app/)
+
+---
+
 포트폴리오 데모는 Vercel 웹 배포에 맞춰져 있습니다. `apps/web`에는 local mock handler가 포함되어 있어 hosted demo는 production API URL 없이도 동작합니다.
 
 The portfolio demo is optimized for Vercel web deployment. `apps/web` contains local mock handlers, so the hosted demo can run without a production API URL.
