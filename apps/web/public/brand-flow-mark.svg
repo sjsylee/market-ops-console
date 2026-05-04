@@ -1,0 +1,50 @@
+<svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="flow-primary" x1="22" y1="18" x2="70" y2="76" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#97F0FF"/>
+      <stop offset="0.42" stop-color="#66A8FF"/>
+      <stop offset="1" stop-color="#2449BE"/>
+    </linearGradient>
+    <linearGradient id="flow-secondary" x1="38" y1="26" x2="76" y2="70" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F4F9FF"/>
+      <stop offset="0.5" stop-color="#B7D5FF"/>
+      <stop offset="1" stop-color="#5A84F6"/>
+    </linearGradient>
+    <radialGradient id="flow-glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(33 31) rotate(42) scale(38 30)">
+      <stop stop-color="#9BE8FF" stop-opacity="0.82"/>
+      <stop offset="1" stop-color="#9BE8FF" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="flow-shadow" x="8" y="10" width="80" height="76" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="8"/>
+      <feGaussianBlur stdDeviation="6"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.0196078 0 0 0 0 0.0901961 0 0 0 0 0.227451 0 0 0 0.22 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_1"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_1" result="shape"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#flow-shadow)">
+    <path
+      d="M25 20C25 17.7909 26.7909 16 29 16H37C39.2091 16 41 17.7909 41 20V76C41 78.2091 39.2091 80 37 80H29C26.7909 80 25 78.2091 25 76V20Z"
+      fill="url(#flow-primary)"
+    />
+
+    <path
+      d="M36.5 31.4C36.5 27.8654 39.3654 25 42.9 25H53.3C59.0753 25 64.6144 27.2945 68.6981 31.3782C72.7818 35.4619 75.0763 41.001 75.0763 46.7763C75.0763 52.5516 72.7818 58.0907 68.6981 62.1744C64.6144 66.2581 59.0753 68.5526 53.3 68.5526H42.9C39.3654 68.5526 36.5 65.6872 36.5 62.1526C36.5 58.618 39.3654 55.7526 42.9 55.7526H53.3C55.6808 55.7526 57.9641 54.8068 59.6477 53.1232C61.3314 51.4395 62.2771 49.1563 62.2771 46.7755C62.2771 44.3947 61.3314 42.1115 59.6477 40.4278C57.9641 38.7442 55.6808 37.7984 53.3 37.7984H42.9C39.3654 37.7984 36.5 34.933 36.5 31.3984V31.4Z"
+      fill="url(#flow-secondary)"
+    />
+
+    <path
+      d="M36.5 31.4C36.5 27.8654 39.3654 25 42.9 25H53.3C59.0753 25 64.6144 27.2945 68.6981 31.3782C72.7818 35.4619 75.0763 41.001 75.0763 46.7763C75.0763 52.5516 72.7818 58.0907 68.6981 62.1744C64.6144 66.2581 59.0753 68.5526 53.3 68.5526H42.9C39.3654 68.5526 36.5 65.6872 36.5 62.1526C36.5 58.618 39.3654 55.7526 42.9 55.7526H53.3C55.6808 55.7526 57.9641 54.8068 59.6477 53.1232C61.3314 51.4395 62.2771 49.1563 62.2771 46.7755C62.2771 44.3947 61.3314 42.1115 59.6477 40.4278C57.9641 38.7442 55.6808 37.7984 53.3 37.7984H42.9C39.3654 37.7984 36.5 34.933 36.5 31.3984V31.4Z"
+      fill="url(#flow-glow)"
+    />
+
+    <path
+      d="M59.4 18.2C61.5 16.9 64.2 17.3 65.8 19.2L68.8 22.8C70.3 24.6 70.2 27.3 68.5 29L57 40.5C55.4 42.1 52.8 42.2 50.9 40.9L47.5 38.5C45.2 36.9 44.9 33.6 46.8 31.7L59.4 18.2Z"
+      fill="url(#flow-primary)"
+    />
+  </g>
+</svg>

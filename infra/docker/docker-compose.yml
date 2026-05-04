@@ -1,0 +1,23 @@
+services:
+  demo-api:
+    build:
+      context: ../..
+      dockerfile: infra/docker/api.Dockerfile
+    environment:
+      API_PORT: 4000
+    ports:
+      - "4000:4000"
+
+  demo-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: market_ops
+      POSTGRES_PASSWORD: market_ops
+      POSTGRES_DB: market_ops_demo
+    ports:
+      - "5432:5432"
+    volumes:
+      - market_ops_demo_data:/var/lib/postgresql/data
+
+volumes:
+  market_ops_demo_data:

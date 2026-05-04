@@ -1,0 +1,20 @@
+{
+  "name": "market-ops-console",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @market-ops/shared && npm run build -w @market-ops/api && npm run build -w @market-ops/web",
+    "ci:verify": "npm run typecheck && npm run build",
+    "dev:web": "npm run dev -w @market-ops/web",
+    "dev:api": "npm run start:dev -w @market-ops/api",
+    "docker:demo": "docker compose -f infra/docker/docker-compose.yml up --build",
+    "typecheck": "npm run typecheck -w @market-ops/shared && npm run typecheck -w @market-ops/api && npm run typecheck -w @market-ops/web"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}
