@@ -3,10 +3,7 @@
 **운영 자동화 콘솔의 기술 구조를 포트폴리오로 재구성한 모노레포입니다.**  
 *A portfolio monorepo reconstructed from a live operations automation project.*
 
-[![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js&logoColor=white)](https://nextjs.org/)
-[![NestJS](https://img.shields.io/badge/NestJS-11-E0234E?logo=nestjs&logoColor=white)](https://nestjs.com/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Tech Stack](https://skillicons.dev/icons?i=nextjs,react,ts,tailwind,nestjs,docker)](https://skillicons.dev)
 [![Demo](https://img.shields.io/badge/Demo-Live%20↗-22c55e)](https://market-ops-console-web.vercel.app/)
 
 > 🔗 **데모:** [market-ops-console-web.vercel.app](https://market-ops-console-web.vercel.app/)
