@@ -1,5 +1,9 @@
 # 🧯 Troubleshooting Log / 트러블슈팅 로그
 
+[← README](../../README.md) · 🔗 [Live Demo](https://market-ops-console-web.vercel.app/)
+
+---
+
 이 문서는 실제 이식과 배포 중 만난 문제를 포트폴리오 레포에 맞게 일반화한 기록입니다.
 
 It keeps the engineering lessons from production troubleshooting while removing private service names, URLs, and deployment targets.

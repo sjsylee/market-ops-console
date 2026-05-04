@@ -1,5 +1,9 @@
 # 🧭 Portfolio Case Study / 포트폴리오 케이스 스터디
 
+[← README](../../README.md) · 🔗 [Live Demo](https://market-ops-console-web.vercel.app/)
+
+---
+
 이 프로젝트는 데스크톱 중심으로 운영되던 작업 흐름을 웹/API 구조로 옮기며 만든 현재 서비스 프로젝트의 포트폴리오 버전입니다.
 
 This project is the portfolio edition of a live service that migrated desktop-oriented operations workflows into a web/API architecture.

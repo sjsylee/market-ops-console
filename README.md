@@ -3,11 +3,17 @@
 **운영 자동화 콘솔의 기술 구조를 포트폴리오로 재구성한 모노레포입니다.**  
 *A portfolio monorepo reconstructed from a live operations automation project.*
 
-> 데모 URL: *(배포 완료 후 추가 예정)*
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js&logoColor=white)](https://nextjs.org/)
+[![NestJS](https://img.shields.io/badge/NestJS-11-E0234E?logo=nestjs&logoColor=white)](https://nestjs.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Demo](https://img.shields.io/badge/Demo-Live%20↗-22c55e)](https://market-ops-console-web.vercel.app/)
+
+> 🔗 **데모:** [market-ops-console-web.vercel.app](https://market-ops-console-web.vercel.app/)
 
 ---
 
-## 이 프로젝트에 대해 / About This Project
+## 💡 이 프로젝트에 대해 / About This Project
 
 실제 서비스 중인 플랫폼 운영 자동화 프로젝트를 기반으로 만든 포트폴리오 버전입니다.  
 민감한 외부 연동 로직과 운영 시크릿은 제외했고, 아키텍처 설계 방식과 엔지니어링 의사결정 과정을 중심으로 구성했습니다.
@@ -20,30 +26,30 @@
 
 ---
 
-## 무엇을 설계했는가 / What I Built
+## 🏗️ 무엇을 설계했는가 / What I Built
 
-### 계약 우선 모노레포 구조 / Contract-First Monorepo
+### 📦 계약 우선 모노레포 구조 / Contract-First Monorepo
 
 `packages/shared`에 Zod schema를 먼저 정의하고, Next.js 웹과 NestJS API가 같은 패키지를 통해 응답 형태를 맞추도록 설계했습니다.  
 스키마가 단일 진실 공급원(single source of truth) 역할을 해서 웹/API 간 타입 불일치를 구조적으로 차단합니다.
 
 *Shared Zod schemas act as the single source of truth. Both the web and API layers consume the same package, making type drift between services structurally impossible.*
 
-### Vercel + VM 분리 배포 관점 / Split Deployment Architecture
+### 🚀 Vercel + VM 분리 배포 관점 / Split Deployment Architecture
 
 웹(Vercel)과 API/DB(VM)를 분리해 운영하는 구조를 전제로 설계했습니다.  
 Vercel BFF와 VM API 사이의 장기 연결 비용, 인증 round-trip, 페이지 진입 시 다중 API 호출 문제를 구체적으로 다뤘습니다.
 
 *Designed with a Vercel web + VM API split in mind. Addressed the latency costs of cross-boundary round-trips, auth serialization, and multi-fetch page entries — not just as theory, but as specific optimizations.*
 
-### 운영 콘솔 UI / Operational Console UI
+### 🖥️ 운영 콘솔 UI / Operational Console UI
 
 작업 허브, 루프별 상세, current 스냅샷, 계정 관리, 실시간 로그, 알림을 포함한 운영 전용 UI입니다.  
 SSE 기반 실시간 상태를 단일 연결에서 컴포넌트별로 구독 분배하는 이벤트 아키텍처를 적용했습니다.
 
 *An operations-first UI covering job hub, loop detail, current snapshots, account management, real-time logs, and notifications. SSE events are distributed from a single connection to component-level subscribers via an internal event bus.*
 
-### 성능 최적화 / Performance Optimization
+### ⚡ 성능 최적화 / Performance Optimization
 
 구조적으로 측정 가능한 개선을 적용했습니다:
 
@@ -61,7 +67,7 @@ SSE 기반 실시간 상태를 단일 연결에서 컴포넌트별로 구독 분
 
 ---
 
-## 기술 스택 / Stack
+## 🛠️ 기술 스택 / Stack
 
 | 영역 | 스택 | 선택 이유 |
 |---|---|---|
@@ -74,7 +80,7 @@ SSE 기반 실시간 상태를 단일 연결에서 컴포넌트별로 구독 분
 
 ---
 
-## 레포 구조 / Repository Structure
+## 📁 레포 구조 / Repository Structure
 
 ```
 apps/web/            # Next.js 운영 콘솔 웹 데모 (Vercel-ready)
@@ -89,21 +95,21 @@ docs/portfolio/      # 성능 최적화, 보안, 트러블슈팅 기록
 
 ---
 
-## 문서 / Documentation
+## 📚 문서 / Documentation
 
 설계 의사결정과 운영 관점 기록을 함께 남겼습니다.
 
-- [Architecture Overview](docs/architecture/overview.md) — 전체 구조와 경계 설계
-- [Runtime Model](docs/architecture/realtime-and-workers.md) — 실시간 이벤트와 워커 런타임 모델
-- [Deployment](docs/deployment/vercel-and-api.md) — Vercel + VM 분리 배포 구조
-- [Case Study](docs/portfolio/case-study.md) — 프로젝트 배경과 엔지니어링 스토리
-- [Performance Optimization](docs/portfolio/performance-optimization.md) — 구조적 성능 개선 기록
-- [Security Hardening](docs/portfolio/security-hardening.md) — 보안 설계 및 강화 기록
-- [Troubleshooting Log](docs/portfolio/troubleshooting-log.md) — 실제 트러블슈팅 사례
+- 🏗️ [Architecture Overview](docs/architecture/overview.md) — 전체 구조와 경계 설계
+- 🔄 [Runtime Model](docs/architecture/realtime-and-workers.md) — 실시간 이벤트와 워커 런타임 모델
+- 🚢 [Deployment](docs/deployment/vercel-and-api.md) — Vercel + VM 분리 배포 구조
+- 🧭 [Case Study](docs/portfolio/case-study.md) — 프로젝트 배경과 엔지니어링 스토리
+- ⚡ [Performance Optimization](docs/portfolio/performance-optimization.md) — 구조적 성능 개선 기록
+- 🛡️ [Security Hardening](docs/portfolio/security-hardening.md) — 보안 설계 및 강화 기록
+- 🧯 [Troubleshooting Log](docs/portfolio/troubleshooting-log.md) — 실제 트러블슈팅 사례
 
 ---
 
-## 실행 방법 / Getting Started
+## 🚀 실행 방법 / Getting Started
 
 ```bash
 npm install
@@ -118,7 +124,7 @@ npm run build      # 전체 빌드 검증
 
 ---
 
-## 포트폴리오 노트 / Portfolio Note
+## 📝 포트폴리오 노트 / Portfolio Note
 
 이 저장소는 현재 서비스 중인 프로젝트의 포트폴리오 버전입니다.  
 실제 외부 API 클라이언트, 계정 세션 처리, 자동화 실행기 내부 로직, 운영 시크릿은 포함하지 않았습니다.  
