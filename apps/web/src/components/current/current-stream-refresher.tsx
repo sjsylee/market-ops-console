@@ -2,16 +2,14 @@
 
 import type { CurrentSyncScope } from '@market-ops/shared';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useMemo } from 'react';
 
-import { useEventStreamEvent } from '../events/event-stream-provider';
+import { type EventRefreshRule, useEventDrivenRefresh } from '../events/use-event-driven-refresh';
 
 const REFRESH_THROTTLE_MS = 1500;
 
 export function CurrentStreamRefresher({ accountId, scope }: { accountId?: string; scope?: CurrentSyncScope }) {
   const router = useRouter();
-  const lastRefreshAtRef = useRef(0);
-  const scheduledRefreshRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const refreshWithoutScrollDrift = useCallback(() => {
     const scrollY = window.scrollY;
@@ -25,47 +23,21 @@ export function CurrentStreamRefresher({ accountId, scope }: { accountId?: strin
     window.setTimeout(restore, 180);
     window.setTimeout(restore, 360);
   }, [router]);
+  const rules = useMemo<EventRefreshRule[]>(
+    () => [
+      {
+        eventName: 'current.sync',
+        enabled: Boolean(accountId),
+        shouldRefresh: (payload) =>
+          payload['accountId'] === accountId &&
+          (!scope || payload['scope'] === scope || payload['scope'] === 'ALL') &&
+          (payload['type'] === 'snapshot-ready' || payload['type'] === 'ended'),
+      },
+    ],
+    [accountId, scope],
+  );
 
-  const queueRefresh = useCallback(() => {
-    const now = Date.now();
-    const elapsed = now - lastRefreshAtRef.current;
-
-    if (elapsed >= REFRESH_THROTTLE_MS) {
-      lastRefreshAtRef.current = now;
-      refreshWithoutScrollDrift();
-      return;
-    }
-
-    if (scheduledRefreshRef.current) {
-      return;
-    }
-
-    scheduledRefreshRef.current = setTimeout(() => {
-      scheduledRefreshRef.current = null;
-      lastRefreshAtRef.current = Date.now();
-      refreshWithoutScrollDrift();
-    }, REFRESH_THROTTLE_MS - elapsed);
-  }, [refreshWithoutScrollDrift]);
-
-  const handler = useCallback((data: Record<string, unknown>) => {
-    if (!accountId) return;
-    if (data['accountId'] !== accountId) return;
-    if (scope && data['scope'] !== scope && data['scope'] !== 'ALL') return;
-    if (data['type'] !== 'snapshot-ready' && data['type'] !== 'ended') return;
-
-    queueRefresh();
-  }, [accountId, queueRefresh, scope]);
-
-  useEventStreamEvent('current.sync', handler, Boolean(accountId));
-
-  useEffect(() => {
-    return () => {
-      if (scheduledRefreshRef.current) {
-        clearTimeout(scheduledRefreshRef.current);
-        scheduledRefreshRef.current = null;
-      }
-    };
-  }, []);
+  useEventDrivenRefresh({ rules, refresh: refreshWithoutScrollDrift, throttleMs: REFRESH_THROTTLE_MS });
 
   return null;
 }

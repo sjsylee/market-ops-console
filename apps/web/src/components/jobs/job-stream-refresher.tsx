@@ -1,9 +1,9 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useMemo } from 'react';
 
-import { useEventStreamEvent } from '../events/event-stream-provider';
+import { type EventRefreshRule, useEventDrivenRefresh } from '../events/use-event-driven-refresh';
 
 type JobLoopKind = 'general-loop' | 'bp-loop' | 'im-loop';
 
@@ -17,56 +17,24 @@ export function JobStreamRefresher({
   accountId?: string;
 }) {
   const router = useRouter();
-  const lastRefreshAtRef = useRef(Date.now());
-  const scheduledRefreshRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const queueRefresh = useCallback(() => {
-    const now = Date.now();
-    const elapsed = now - lastRefreshAtRef.current;
-
-    if (elapsed >= REFRESH_THROTTLE_MS) {
-      lastRefreshAtRef.current = now;
-      router.refresh();
-      return;
-    }
-
-    if (scheduledRefreshRef.current) {
-      return;
-    }
-
-    scheduledRefreshRef.current = setTimeout(() => {
-      scheduledRefreshRef.current = null;
-      lastRefreshAtRef.current = Date.now();
-      router.refresh();
-    }, REFRESH_THROTTLE_MS - elapsed);
+  const refresh = useCallback(() => {
+    router.refresh();
   }, [router]);
+  const rules = useMemo<EventRefreshRule[]>(
+    () => [
+      {
+        eventName: kind,
+        enabled: Boolean(accountId),
+        shouldRefresh: (payload) =>
+          (payload['type'] === 'state' || payload['type'] === 'ended') &&
+          typeof payload['accountId'] === 'string' &&
+          payload['accountId'] === accountId,
+      },
+    ],
+    [accountId, kind],
+  );
 
-  const handler = useCallback((data: Record<string, unknown>) => {
-    if (!accountId) {
-      return;
-    }
-
-    if (data['type'] !== 'state' && data['type'] !== 'ended') {
-      return;
-    }
-
-    if (typeof data['accountId'] !== 'string' || data['accountId'] !== accountId) {
-      return;
-    }
-
-    queueRefresh();
-  }, [accountId, queueRefresh]);
-
-  useEventStreamEvent(kind, handler, Boolean(accountId));
-
-  useEffect(() => {
-    return () => {
-      if (scheduledRefreshRef.current) {
-        clearTimeout(scheduledRefreshRef.current);
-        scheduledRefreshRef.current = null;
-      }
-    };
-  }, []);
+  useEventDrivenRefresh({ rules, refresh, throttleMs: REFRESH_THROTTLE_MS, startThrottled: true });
 
   return null;
 }

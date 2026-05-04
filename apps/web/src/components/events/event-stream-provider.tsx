@@ -3,8 +3,8 @@
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 
-type EventStreamName = 'general-loop' | 'bp-loop' | 'im-loop' | 'lowest-loop' | 'current.sync';
-type EventStreamPayload = Record<string, unknown>;
+export type EventStreamName = 'general-loop' | 'bp-loop' | 'im-loop' | 'lowest-loop' | 'current.sync';
+export type EventStreamPayload = Record<string, unknown>;
 type EventStreamHandler = (payload: EventStreamPayload) => void;
 
 type EventStreamContextValue = {
@@ -97,4 +97,8 @@ export function useEventStreamEvent(eventName: EventStreamName, handler: EventSt
 
     return context.subscribe(eventName, handler);
   }, [context, enabled, eventName, handler]);
+}
+
+export function useEventStreamContext() {
+  return useContext(EventStreamContext);
 }
