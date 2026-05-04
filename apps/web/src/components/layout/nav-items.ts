@@ -11,17 +11,17 @@ export type NavItem = {
 export const navItems: NavItem[] = [
   {
     href: "/",
+    label: "서비스 소개",
+    shortLabel: "소개",
+    description: "운영 자동화 소개",
+    icon: MonitorPlay,
+  },
+  {
+    href: "/home",
     label: "홈",
     shortLabel: "홈",
     description: "전체 운영 상태 확인",
     icon: Home,
-  },
-  {
-    href: "/demo",
-    label: "데모",
-    shortLabel: "데모",
-    description: "포트폴리오 공개 범위",
-    icon: MonitorPlay,
   },
   {
     href: "/current",
