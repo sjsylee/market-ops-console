@@ -11,7 +11,7 @@ on:
       - "package.json"
       - "package-lock.json"
       - "tsconfig.base.json"
-      - "vercel.json"
+      - "apps/web/vercel.json"
   push:
     branches:
       - main
@@ -22,7 +22,7 @@ on:
       - "package.json"
       - "package-lock.json"
       - "tsconfig.base.json"
-      - "vercel.json"
+      - "apps/web/vercel.json"
 
 permissions:
   contents: read
@@ -56,24 +56,24 @@ jobs:
 
       - name: Link Vercel project
         run: |
-          mkdir -p .vercel
-          printf '{"orgId":"%s","projectId":"%s"}' "$VERCEL_ORG_ID" "$VERCEL_PROJECT_ID" > .vercel/project.json
+          mkdir -p apps/web/.vercel
+          printf '{"orgId":"%s","projectId":"%s"}' "$VERCEL_ORG_ID" "$VERCEL_PROJECT_ID" > apps/web/.vercel/project.json
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Pull Vercel preview environment
-        run: vercel pull --yes --environment=preview --token="$VERCEL_TOKEN"
+        run: vercel pull --yes --environment=preview --cwd apps/web --token="$VERCEL_TOKEN"
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
       - name: Build Vercel output
-        run: vercel build --token="$VERCEL_TOKEN"
+        run: vercel build --cwd apps/web --token="$VERCEL_TOKEN"
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy preview
-        run: vercel deploy --prebuilt --archive=tgz --token="$VERCEL_TOKEN"
+        run: vercel deploy --prebuilt --archive=tgz --cwd apps/web --token="$VERCEL_TOKEN"
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
@@ -101,23 +101,23 @@ jobs:
 
       - name: Link Vercel project
         run: |
-          mkdir -p .vercel
-          printf '{"orgId":"%s","projectId":"%s"}' "$VERCEL_ORG_ID" "$VERCEL_PROJECT_ID" > .vercel/project.json
+          mkdir -p apps/web/.vercel
+          printf '{"orgId":"%s","projectId":"%s"}' "$VERCEL_ORG_ID" "$VERCEL_PROJECT_ID" > apps/web/.vercel/project.json
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Pull Vercel production environment
-        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+        run: vercel pull --yes --environment=production --cwd apps/web --token="$VERCEL_TOKEN"
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
       - name: Build Vercel output
-        run: vercel build --prod --token="$VERCEL_TOKEN"
+        run: vercel build --prod --cwd apps/web --token="$VERCEL_TOKEN"
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy production
-        run: vercel deploy --prebuilt --prod --archive=tgz --token="$VERCEL_TOKEN"
+        run: vercel deploy --prebuilt --prod --archive=tgz --cwd apps/web --token="$VERCEL_TOKEN"
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
