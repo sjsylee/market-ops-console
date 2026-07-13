@@ -10,6 +10,21 @@
 
 ---
 
+## 🎯 Problem / 문제인식
+
+이 운영 도구는 원래 데스크톱 앱이었습니다. 그래서 작업을 확인하거나 조작하려면 앱이 깔린 PC 앞에 있어야 했고, 이동이 잦거나 해외 출장이 많은 사용자에게는 이게 큰 제약이었습니다. 자리를 비우면 실행 중인 작업에 손을 댈 수 없었으니까요. 그래서 브라우저만 있으면 어디서든 작업을 보고 제어할 수 있도록 웹/API 구조로 옮겼습니다.
+
+문제는 그 이동 자체가 더 근본적인 과제를 만들었다는 점입니다. 데스크톱에서는 작업 상태도, 매크로 실행 로그도 전부 **로컬에 있어 즉시 접근**할 수 있었습니다. 하지만 웹을 **Vercel**에, API/DB를 **별도 VM**에 분리 배포하는 순간, 그 모든 데이터가 **네트워크 경계 너머로** 떨어져 나갑니다. 여기서 구조적 문제가 뚜렷해졌습니다.
+
+- **한 페이지에 필요한 상태를 API로 5~9번 나눠 가져오는 구조** — 루프·계정·큐 상태를 개별 호출로 긁어오다 보니 화면에 진입할 때마다 왕복 비용이 쌓였습니다.
+- **매크로 실시간 로그의 스트리밍** — 데스크톱에선 로컬 콘솔에 바로 찍히던 실행 로그를, 웹에서는 SSE로 브라우저까지 흘려보내야 했고, 화면·컴포넌트마다 연결이 중복으로 늘어나기 쉬웠습니다.
+
+게다가 웹과 API가 분리되며 둘 사이의 **응답 형태가 어긋날(type drift)** 위험도 생겼습니다. 이 저장소는 이 문제들을 **contract-first 설계와 구조적 재설계**로 어떻게 풀었는지에 집중합니다.
+
+*This ops tool started as a desktop app, so you had to sit at the PC where it was installed to check or control jobs — a real constraint for users who travel or work abroad. Moving it to a web/API architecture made it reachable from any browser. But the move created a deeper problem: on desktop, job state and macro execution logs were all local and instantly accessible; splitting the web (Vercel) from the API/DB (a separate VM) pushed all of it across a network boundary. Page entries ended up pulling state through 5–9 separate API calls, and macro logs once printed to a local console now had to stream to the browser over SSE — where connections easily multiplied per screen. The split also risked response-shape drift between web and API. This repo focuses on solving these through contract-first design and structural redesign.*
+
+---
+
 ## 💡 이 프로젝트에 대해 / About This Project
 
 실제 서비스 중인 플랫폼 운영 자동화 프로젝트를 기반으로 만든 포트폴리오 버전입니다.  
@@ -46,9 +61,11 @@ SSE 기반 실시간 상태를 단일 연결에서 컴포넌트별로 구독 분
 
 *An operations-first UI covering job hub, loop detail, current snapshots, account management, real-time logs, and notifications. SSE events are distributed from a single connection to component-level subscribers via an internal event bus.*
 
-### ⚡ 성능 최적화 / Performance Optimization
+---
 
-구조적으로 측정 가능한 개선을 적용했습니다:
+## 📈 Result / 성과 · 한계
+
+분리 배포가 만든 구조적 문제들을 재설계로 풀었습니다. 마이크로 최적화가 아니라 **API 경계와 이벤트 아키텍처를 다시 설계**한 결과입니다.
 
 | 개선 항목 | Before | After |
 |---|---|---|
@@ -60,7 +77,12 @@ SSE 기반 실시간 상태를 단일 연결에서 컴포넌트별로 구독 분
 | 실시간 로그 브라우저 보관 | 장시간 실행 시 DOM 무제한 증가 | 최근 120개 슬라이딩 윈도우 |
 | SSE 계정 소유권 확인 DB 쿼리 | 이벤트 발행마다 DB 조회 | 연결 단위 30초 TTL 캐시 |
 
-*Quantifiable structural improvements — not micro-optimizations, but re-designed API boundaries and event architecture.*
+**한계 / 다음 단계**
+
+- 이 저장소는 **포트폴리오 에디션**이라 실행 로직·실측값이 데모 데이터로 대체되어, 저장소 안에서 위 수치를 직접 재현하지는 않습니다. 개선의 설계는 코드 경계로 남아 있습니다.
+- 부하 테스트 기반 **정량 벤치마크(ms·%)는 없으며**, 개선은 API 경계·이벤트 아키텍처의 **구조적 재설계**에 집중했습니다.
+
+*Structural improvements — not micro-optimizations but redesigned API boundaries and event architecture. As a portfolio edition running on demo data, the exact figures aren't reproduced in-repo; the designs remain visible in the code boundaries.*
 
 ---
 
