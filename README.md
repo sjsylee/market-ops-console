@@ -57,27 +57,8 @@ SSE 기반 실시간 상태를 단일 연결에서 컴포넌트별로 구독 분
 
 *An operations-first UI covering job hub, loop detail, current snapshots, account management, real-time logs, and notifications. SSE events are distributed from a single connection to component-level subscribers via an internal event bus.*
 
----
-
-## 📸 Screenshots / 스크린샷
-
-> 🔗 라이브 데모에서 직접 확인: [market-ops-console-web.vercel.app](https://market-ops-console-web.vercel.app/) · 데모 데이터 화면입니다. / *Live demo with demo data.*
-
-<div align="center">
-
-**운영 대시보드** — 실행 중·대기·확인 필요 작업과 매크로 상황·입찰 현황을 한 화면에서  
-*Operations dashboard — running / pending / attention jobs, macro runtime, and the bid board in one view*
-
-<img src="docs/screenshots/dashboard.png" width="88%" alt="Market Ops Console 운영 대시보드 — 작업 상태·매크로·입찰 현황" />
-
-<br/><br/>
-
-**매크로 상세** — 매크로별 실행 제어와 큐 상태 (브라우저를 닫아도 서버에서 계속 실행)  
-*Macro detail — per-macro run control and queue status; work keeps running server-side even if the browser closes*
-
-<img src="docs/screenshots/macro-detail.png" width="88%" alt="Market Ops Console 매크로 상세 — 실행 제어·큐 상태" />
-
-</div>
+> 🖥️ **UI는 라이브 데모에서 직접 확인하세요:** [market-ops-console-web.vercel.app](https://market-ops-console-web.vercel.app/) — 데스크톱·모바일 반응형 운영 콘솔을 데모 데이터로 둘러볼 수 있습니다.
+> *See the UI live — a responsive desktop/mobile operations console running on demo data.*
 
 ---
 
