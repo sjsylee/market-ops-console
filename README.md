@@ -19,9 +19,9 @@
 - **한 페이지에 필요한 상태를 API로 5~9번 나눠 가져오는 구조** — 루프·계정·큐 상태를 개별 호출로 긁어오다 보니 화면에 진입할 때마다 왕복 비용이 쌓였습니다.
 - **매크로 실시간 로그의 스트리밍** — 데스크톱에선 로컬 콘솔에 바로 찍히던 실행 로그를, 웹에서는 SSE로 브라우저까지 흘려보내야 했고, 화면·컴포넌트마다 연결이 중복으로 늘어나기 쉬웠습니다.
 
-게다가 웹과 API가 분리되며 둘 사이의 **응답 형태가 어긋날(type drift)** 위험도 생겼습니다. 이 저장소는 이 문제들을 **contract-first 설계와 구조적 재설계**로 어떻게 풀었는지에 집중합니다.
+게다가 웹과 API가 분리되며 둘 사이의 **응답 형태가 어긋날(type drift)** 위험도 생겼습니다. 이 저장소는 이 문제들을, **웹과 API가 하나의 스키마를 공유하는 contract-first 설계**와 **API 경계·이벤트 구조를 다시 설계하는 방식**으로 어떻게 풀었는지에 집중합니다.
 
-*This ops tool started as a desktop app, so you had to sit at the PC where it was installed to check or control jobs — a real constraint for users who travel or work abroad. Moving it to a web/API architecture made it reachable from any browser. But the move created a deeper problem: on desktop, job state and macro execution logs were all local and instantly accessible; splitting the web (Vercel) from the API/DB (a separate VM) pushed all of it across a network boundary. Page entries ended up pulling state through 5–9 separate API calls, and macro logs once printed to a local console now had to stream to the browser over SSE — where connections easily multiplied per screen. The split also risked response-shape drift between web and API. This repo focuses on solving these through contract-first design and structural redesign.*
+*This ops tool started as a desktop app, so you had to sit at the PC where it was installed to check or control jobs — a real constraint for users who travel or work abroad. Moving it to a web/API architecture made it reachable from any browser. But the move created a deeper problem: on desktop, job state and macro execution logs were all local and instantly accessible; splitting the web (Vercel) from the API/DB (a separate VM) pushed all of it across a network boundary. Page entries ended up pulling state through 5–9 separate API calls, and macro logs once printed to a local console now had to stream to the browser over SSE — where connections easily multiplied per screen. The split also risked response-shape drift between web and API. This repo focuses on how they were solved — a contract-first design where web and API share one schema, plus a redesign of API boundaries and the event layer.*
 
 ---
 
